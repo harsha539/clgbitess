@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>CLGBITES - Campus Food Delivery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{font-family:Arial;margin:0;background:#f4f6f9;}
+
+header{
+background:#1F3C5B;
+color:white;
+padding:20px;
+text-align:center;
+}
+
+.container{padding:20px;}
+
+.restaurant{
+background:white;
+padding:15px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:6px 0;
+}
+
+button{
+background:#F4A300;
+border:none;
+padding:5px 10px;
+border-radius:5px;
+cursor:pointer;
+}
+
+.qty button{
+padding:3px 8px;
+margin:0 3px;
+}
+
+.cart{
+background:white;
+padding:15px;
+margin-top:20px;
+border-radius:10px;
+}
+
+input{
+width:100%;
+padding:8px;
+margin:5px 0;
+}
+
+.category{
+margin-top:10px;
+font-weight:bold;
+color:#1F3C5B;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>CLGBITES</h1>
+<p>Campus Food Delivery | ₹10 Per Item</p>
+</header>
+
+<div class="container" id="menuContainer"></div>
+
+<div class="container">
+<div class="cart">
+
+<h3>Cart</h3>
+<div id="cartItems"></div>
+<p id="total"></p>
+
+<h3>Checkout</h3>
+<input type="text" id="name" placeholder="Your Name">
+<input type="text" id="phone" placeholder="Mobile Number">
+
+<button onclick="sendOrder()">Place Order on WhatsApp</button>
+
+</div>
+</div>
+
+<script>
+
+const menuData={
+
+"Spice Magic":{
+"Chicken Biryani":[
+["Chicken Dum Biryani",100],
+["Chicken Dum Full",150],
+["Chicken Fry Biryani",170],
+["Chicken Mixed Biryani",180]
+]
+},
+
+"Ruchi Pulka Point":{
+"Pulkas":[
+["1 Pulka",10],
+["3 Pulkas + Veg Curries",50],
+["3 Pulkas + Egg Bhurji",60],
+["3 Pulkas + Chicken Curry",80],
+["Single Egg Omelette",20],
+["Double Egg Omelette",40],
+["2 Chapati + 2 Veg Curries",50]
+]
+},
+
+"Food Corner":{
+"Noodles":[
+["Veg Noodles",70],
+["Egg Noodles",80],
+["Chicken Noodles",90]
+],
+"Fried Rice":[
+["Veg Fried Rice",70],
+["Egg Fried Rice",80],
+["Chicken Fried Rice",90]
+],
+"Manchurian":[
+["Veg Manchurian",70],
+["Egg Manchurian",80],
+["Chicken Manchurian",160],
+["4P Chicken Lollipop",140],
+["Chilli Chicken",160],
+["Chicken Pakoda 250g",130]
+]
+},
+"Tiffens":{
+
+"Breakfast & Snacks":[
+["Idli (4 pcs)",40],
+["Gari (4 pcs)",40],
+["Baji (4 pcs)",40],
+["Mirchi Baji (4 pcs)",30],
+["Punugulu",40],
+["Poori (2 pcs)",35]
+],
+
+"Dosa Corner":[
+["Masala Dosa",50],
+["Onion Dosa",45],
+["Single Egg Dosa",45],
+["Double Egg Dosa",60]
+],
+
+"Tawa Items":[
+["Chapati",40],
+["Parotha",40],
+["Single Omelet",30],
+["Double Egg Omelet",50]
+]
+
+},
+
+"Fruit Market":{
+"Fruits":[
+["Bananas (1kg)",50],
+["Oranges (1kg)",100],
+["Pomegranate (1kg)",200],
+["Apples (1kg)",200],
+["Green Grapes",200],
+["Black Grapes",350]
+]
+},
+
+"Bheemasena":{
+
+"Veg Biryani":[
+["Veg Biryani Rice",180],
+["Veg Biryani",240],
+["Spl Veg Biryani",260],
+["Mushroom Biryani",270],
+["Paneer Biryani",270]
+],
+
+"Non Veg Biryani":[
+["Chicken Dum Biryani",270],
+["Chicken Fry Biryani",280],
+["Chicken Tikka Biryani",320],
+["Mutton Dum Biryani",410],
+["Mutton Fry Biryani",400]
+],
+
+"Starters":[
+["Veg Manchuria",210],
+["Chilli Chicken",290],
+["Chicken 65",290],
+["Dragon Chicken",300],
+["Apollo Fish",330]
+],
+
+"Mini Biryanis":[
+["Mini Dum Biryani",170],
+["Mini Fry Biryani",180],
+["Mini Boneless Biryani",190],
+["Mini Paneer Biryani",190],
+["Mini Mushroom Biryani",180]
+],
+
+"Veg Fried Rice":[
+["Zeera Rice",210],
+["Veg Fried Rice",230],
+["Paneer Fried Rice",260],
+["Kaju Fried Rice",270],
+["Mushroom Fried Rice",250],
+["Bheemasena Spl Fried Rice",310]
+],
+
+"Non Veg Fried Rice":[
+["Egg Fried Rice",260],
+["Chicken Fried Rice",280],
+["Spl Chicken Fried Rice",300],
+["Prawns Fried Rice",330],
+["Mutton Fried Rice",360],
+["Bheemasena Spl Non Veg Fried Rice",390]
+],
+
+"Thali":[
+["Thali",140],
+["Thali Parcel",160],
+["Thali Parcel Single",130],
+["Ragi Sangati",110],
+["Natukodi Curry",350],
+["White Rice",80],
+["Curd Rice",90],
+["Spl Curd Rice",150]
+],
+
+"Bucket Biryanis":[
+["Chicken Dum Bucket Biryani",800],
+["Fry Chicken Bucket Biryani",850],
+["Spl Chicken Bucket Biryani",880],
+["Wings Bucket Biryani",890],
+["Lollipop Bucket Biryani",950],
+["Kundan Bucket Biryani",1150],
+["Prawns Bucket Biryani",1100],
+["Fish Bucket Biryani",1000],
+["Mutton Bucket Biryani",1200]
+],
+
+"Curries":[
+["Butter Chicken",290],
+["Hyderabad Chicken",290],
+["Chicken Curry",270],
+["Mutton Curry",380],
+["Prawns Curry",350]
+],
+
+"Breads":[
+["Pulka",15],
+["Butter Pulka",20],
+["Roti",25],
+["Butter Roti",30],
+["Plain Naan",35],
+["Butter Naan",45],
+["Garlic Naan",70]
+],
+
+"Beverages":[
+["Water Bottle",20],
+["Soft Drink",25],
+["Butter Milk",50],
+["Lassi",70]
+]
+
+}
+
+};
+
+const container=document.getElementById("menuContainer");
+
+for(let restaurant in menuData){
+
+let div=document.createElement("div");
+div.className="restaurant";
+div.innerHTML="<h3>"+restaurant+"</h3>";
+
+for(let category in menuData[restaurant]){
+
+div.innerHTML+="<div class='category'>"+category+"</div>";
+
+menuData[restaurant][category].forEach(item=>{
+
+div.innerHTML+=`
+<div class="item">
+<span>${item[0]} - ₹${item[1]}</span>
+<div class="qty">
+<button onclick="changeQty('${item[0]}',${item[1]},-1)">-</button>
+<span id="qty-${item[0].replace(/ /g,'')}">0</span>
+<button onclick="changeQty('${item[0]}',${item[1]},1)">+</button>
+</div>
+</div>
+`;
+
+});
+
+}
+
+container.appendChild(div);
+
+}
+
+let cart={};
+
+function changeQty(item,price,delta){
+
+if(!cart[item]) cart[item]={price:price,qty:0};
+
+cart[item].qty+=delta;
+
+if(cart[item].qty<=0){
+delete cart[item];
+document.getElementById("qty-"+item.replace(/ /g,'')).innerText=0;
+}else{
+document.getElementById("qty-"+item.replace(/ /g,'')).innerText=cart[item].qty;
+}
+
+displayCart();
+}
+
+function displayCart(){
+
+let cartDiv=document.getElementById("cartItems");
+cartDiv.innerHTML="";
+
+let totalAmount=0;
+let totalItems=0;
+
+for(let item in cart){
+
+let qty=cart[item].qty;
+let price=cart[item].price;
+
+totalAmount+=price*qty;
+totalItems+=qty;
+
+cartDiv.innerHTML+=`<p>${item} x${qty} - ₹${price*qty}</p>`;
+
+}
+
+let service=totalItems*10;
+let grand=totalAmount+service;
+
+document.getElementById("total").innerHTML=
+"Food Total: ₹"+totalAmount+
+"<br>Service Charge: ₹"+service+
+"<br><b>Grand Total: ₹"+grand+"</b>";
+
+}
+
+function sendOrder(){
+let name=document.getElementById("name").value.trim();
+let phone=document.getElementById("phone").value.trim();
+
+if(name==""||phone==""){alert("Fill details");return;}
+
+let msg="🛵 CLGBITES Order\n\n";
+msg+="Name: "+name+"\n";
+msg+="Phone: "+phone+"\n\n";
+
+let total=0;
+let items=0;
+
+for(let item in cart){
+
+let q=cart[item].qty;
+let p=cart[item].price*q;
+
+msg+=item+" x"+q+" - ₹"+p+"\n";
+
+total+=p;
+items+=q;
+
+}
+
+let service=items*10;
+let grand=total+service;
+
+msg+="\nService: ₹"+service;
+msg+="\nTotal: ₹"+grand;
+
+let url="https://wa.me/917396018423?text="+encodeURIComponent(msg);
+
+window.open(url,"_blank");
+
+}
+
+</script>
+
+</body>
+</html>
